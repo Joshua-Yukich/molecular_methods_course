@@ -100,7 +100,7 @@ virus_NJ  <- NJ(dna_dist)
 plot(virus_UPGMA, main="UPGMA")
 
 plot(virus_NJ, main = "Neighbor Joining")
-plot(virus_NJ, type = "unrooted")
+plot(virus_NJ, type = "unrooted", cex = 0.5)
 plot(virus_NJ, type = "cladogram")
 plot(virus_NJ, type = "fan")
 plot(virus_NJ, type = "radial")
