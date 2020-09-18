@@ -3,13 +3,13 @@
 #  Intro to Reproducible use of genetic sequences in R and genetic epi        #
 #                                                                             #
 #   Script developed to highlight reproducible research methods               #
-#     and to highlight use of tools realted to sequencing and                 #
+#     and to highlight use of tools related to sequencing and                 #
 #     use and interpretation of genetic sequence data in the R                #
 #     programming language and environment.                                   #
 #                                                                             #
 #    Written in R version 4.0.2 using R Studio 1.3.1073                       #
 #                                                                             #
-#  Dependndies: tidyverse, bioconductor, seqinr, outbreaker2, rprojroot,      #
+#  Dependencies: tidyverse, bioconductor, seqinr, outbreaker2, rprojroot,     #
 #               seqinr, ape, phangorn, DECIPHER, adephylo, adegenet           #
 #                                                                             #
 #                                                                             #
@@ -42,6 +42,7 @@ library(phangorn)
 library(DECIPHER)
 library(adephylo)
 library(adegenet)
+
 # session info -----
 
 run_date <- date()
