@@ -96,7 +96,7 @@ dna_dist
 
 virus_UPGMA <- upgma(dna_dist)
 
-virus_NJ  <- NJ(dna_dist)
+virus_NJ <- NJ(dna_dist)
 
 plot(virus_UPGMA, main="UPGMA")
 
@@ -106,6 +106,36 @@ plot(virus_NJ, type = "cladogram")
 plot(virus_NJ, type = "fan")
 plot(virus_NJ, type = "radial")
 bullseye(virus_NJ, font = 2, cex = 0.5)
+
+# genome length alignment ----
+
+# load dataset with five 100k+ BP DNA sequences
+long_seqs <- readDNAStringSet(file.path(getwd(), "R_example", "plastid_genomes.fa"))
+long_seqs
+
+# prep as a local database ----
+
+Seqs2DB(long_seqs, "XStringSet", "long_db", names(long_seqs))
+
+# find synteny
+
+synteny <- FindSynteny("long_db")
+pairs(synteny)
+plot(synteny)
+
+# do alignment
+
+alignment <- AlignSynteny(synteny, "long_db")
+
+# Extract each alignment and Write FASTA Alignment files.
+# DOne one by one. UNless you want to write more efficeint. 
+
+blocks <- unlist(alignment[[1]])
+
+writeXStringSet(blocks, "genome_blocks_out.fa")
+
+
+
 
 # outbreaker2 demo ----
 # restore graphics settings 
