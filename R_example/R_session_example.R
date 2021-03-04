@@ -34,14 +34,15 @@
 
 # loading required libraries ----
 library(rprojroot)
+library(rstudioapi)
 library(tidyverse)
 library(seqinr)
 library(outbreaker2)
 library(ape)
 library(phangorn)
-library(DECIPHER)
 library(adephylo)
 library(adegenet)
+library(DECIPHER)
 
 # session info -----
 
