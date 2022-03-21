@@ -100,7 +100,9 @@ virus_UPGMA <- upgma(dna_dist)
 
 virus_NJ <- NJ(dna_dist)
 
+#CairoPDF(file = "test.pdf")
 plot(virus_UPGMA, main="UPGMA")
+#dev.off()
 
 plot(virus_NJ, main = "Neighbor Joining")
 plot(virus_NJ, type = "unrooted", cex = 0.5)
@@ -176,7 +178,9 @@ writeXStringSet(DNA, file="./R_example/outbreaker_aligned.fna")
 seqs <- read.dna("./R_example/outbreaker_aligned.fna", format="fasta")
 seqs
 outbreaker_phyDat <- phyDat(seqs, type = "DNA", levels = NULL)
-mt <- modelTest(outbreaker_phyDat, model = c("JC", "F81"))
+tree <- NJ(dist.ml(outbreaker_phyDat, "JC"))
+
+mt <- modelTest(outbreaker_phyDat, tree= tree, model = c("JC", "F81"))
 print(mt)
 
 # choose a model and create a distance matrix
