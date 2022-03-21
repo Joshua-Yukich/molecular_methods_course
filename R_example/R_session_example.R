@@ -85,8 +85,9 @@ seqs
 #create a phyDat object
 virus_phyDat <- phyDat(seqs, type = "DNA", levels = NULL)
 
+tree <- NJ(dist.ml(virus_phyDat, "JC"))
 # test a vareity of nucleotide substitution models
-mt <- modelTest(virus_phyDat, model = c("JC", "F81"))
+mt <- modelTest(virus_phyDat, tree = tree, model = c("JC", "F81"))
 
 print(mt)
 
