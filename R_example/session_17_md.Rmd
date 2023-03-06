@@ -1,0 +1,114 @@
+---
+title: 'Session 17 Script: R notebook using R markdown to produce a literate program'
+author: "Joshua Yukich"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include = FALSE}
+#----------------------------------------------------------------------------#
+#                                                                            #
+#  Session 17 Script: R notebook using R markdown to produce a literate      #
+#   program                                                                  #
+#    J. Yukich October 17th 2019  jyukich@tulane.edu                         #
+#                                                                            #
+#    This script is a demonstration of the basic principles of               #
+#    developing a literate program                                           #
+#    using R and markdown to produce a dynamic document                      #
+#                                                                            #
+#    It requires the use of the rmarkdown and knitr packages as well as      #
+#    ggplot2                                                                 #
+#    It was developed in R 3.5.3. rmarkdown is automatically handled         #
+#    by rstudio as is knitr so you dont have to load the m when you use      #
+#    r studio to compile this                                                #
+#----------------------------------------------------------------------------#
+
+# loading required libraries ----
+library(ggplot2)
+
+#set any other options ----
+
+```
+
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. Try executing the chunk below by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+
+Since the code chunk below includes the header argument "echo = FALSE" you will only see its outputs when you compile the dynamic document.
+
+
+# Compile date and session info
+
+```{r docinfo, echo = FALSE}
+
+# print and get runtime ----
+date()
+
+# session info ----
+sessionInfo()
+
+```
+
+# An example using a paired Student's *t*-test 
+
+This document first includes by direct input data from an experiment in which ten mice were fed an experimental drug and weighed before and after the experiment. The goal was to determine if the mice would gain a meaningful amount of weight before and after the adminsitration of drug. Hence we have ten pairs of weights, each representing the two measurements of weight in each mouse. The code below shows the entry of the data directly, as well as some minor tidying followed by execution of the paried Student's *t*-test using the data either input as two seperate vectors, or using a "formula" object and a data frame. 
+
+
+```{r ttest, include = "TRUE"}
+# Weight of the mice before treatment
+before <- c(200.1, 190.9, 192.7, 213, 241.4, 196.9, 172.2, 185.5, 205.2, 193.7)
+# Weight of the mice after treatment
+after <- c(392.9, 393.2, 345.1, 393, 434, 427.9, 422, 383.9, 392.3, 352.2)
+
+# Create a data frame
+my_data <- data.frame(group = rep(c("before", "after"), each = 10),
+                weight = c(before,  after))
+
+my_data$id <- rep(1:10, times = 2)
+
+# Compute t-test using two different numeric vectors
+res1 <- t.test(after, before, paired = TRUE)
+res1
+
+# Compute t-test from data.frame
+res2 <- t.test(weight ~ group, data = my_data, paired = TRUE)
+res2
+```
+
+
+One can see that the results of both approaches are exactly the same (this of course is only true when the arguments are specified correctly). 
+
+
+# Making a plot 
+
+The *ggplot* code below will produce a plot which if included in a code chunk will be automatically placed into the document. Adding the "echo = FALSE" argument to the code chunk header makes a clean entry for the plot with only plot output.
+
+```{r plot_code, eval = FALSE, echo = FALSE}
+ggplot(data = my_data, aes(x = group, y = weight)) +
+  geom_path(aes(group = id)) +
+  geom_point() + ylim(0, 500) + theme_bw()
+```
+
+
+
+```{r plot, echo = FALSE, fig.cap = "Example Figure"}
+# reorder factor levels
+my_data$group <- factor(my_data$group)
+my_data$group <- factor(my_data$group, levels(my_data$group)[c(2, 1)])
+
+ggplot(data = my_data, aes(x = group, y = weight)) +
+  geom_path(aes(group = id)) +
+  geom_point() + ylim(0, 500) + theme_bw()
+```
+
+# Including R inline code 
+
+The above code chunks only put outputs into the documents as whole sections in a document. From time to time you may want to directly include elements from R directly inside the course of a sentence.
+
+For example: The results of a Student's paired *t*-test applied to the before and after mice weight dataset were highly signficant with an estimated mean of the difference in weight of `r res2[["estimate"]]` grams (*p*-value `r ifelse(res2[["p.value"]] < 0.001, "< 0.001", paste('=', res2[["p.value"]], sep =" "))`) between the measurements of weight before and after treatment.
+
