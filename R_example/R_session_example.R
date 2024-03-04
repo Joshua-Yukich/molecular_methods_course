@@ -13,7 +13,7 @@
 #               seqinr, ape, phangorn, DECIPHER, adephylo, adegenet           #
 #                                                                             #
 #                                                                             #
-#                                                                             #
+#                   author: Joshua Yukich jyukich@tulane.edu                  #
 #                                                                             #
 #                                                                             #
 #                                                                             #
@@ -218,7 +218,7 @@ plot(res, "mu", "density", burnin = 2000)
 plot(res, type = "alpha", burnin = 2000)
 plot(res, type = "t_inf", burnin = 2000)
 plot(res, type = "kappa", burnin = 2000)
-plot(res, type = "network", burnin = 2000, min_support = 0.01)
+plot(res, type = "network", burnin = 2000, min_support = 0.01, labels = data$ids)
 
 
 

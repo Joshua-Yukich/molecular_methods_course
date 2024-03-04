@@ -1,0 +1,428 @@
+---
+title: 'Session 20 Script: ggplot'
+author: "Joshua Yukich"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_notebook: default
+---
+
+```{r setup, include = FALSE}
+#----------------------------------------------------------------------------#
+#                                                                            #
+#  Session 20 Script: intro to ggplot                                        #
+#   program                                                                  #
+#    J. Yukich novembner 23rd 2019  jyukich@tulane.edu                       #
+#                                                                            #
+#    This script is a demonstration of the basic principles of               #
+#    principles of making graphics in R using ggplot                         #
+#         Original exercise derived from rebecca barter                      #
+#       http://www.rebeccabarter.com/blog/2017-11-17-ggplot2_tutorial/       #
+#       and laura ellis https://www.littlemissdata.com/about                 #
+#    It requires the use ggplot2, tidyverse, Hmisc, ggmap, and lubridate     #
+#                                                                            #
+#    It was developed in R 3.5.3.                                            #
+#----------------------------------------------------------------------------#
+
+# loading required libraries ----
+library(ggplot2)
+library(tidyverse)
+library(Hmisc)
+library(ggmap)
+library(lubridate)
+library(camrePalettes)
+library(dichromat)
+library(rprojroot)
+#set any other options ----
+
+# setting working directory and other user preferences -----
+
+if (interactive()) {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+}
+
+base_path <- find_root('base_environment.R')
+
+setwd(base_path)
+
+source('./base_environment.R')
+```
+
+# Compile date and session info
+
+```{r docinfo, echo = FALSE}
+
+# print and get runtime ----
+date()
+
+# session info ----
+sessionInfo()
+
+```
+
+We'll use a dataset from gapminder for the first part of the session it contains information on the GDP per capita and life expectancy for the countries of the world overtime.  
+
+```{r data}
+gapminder <- read_csv(paste0(base_path, "/genomic_data_visulization/gapminder.csv"))
+```
+
+To provide some basic descriptives we can look at the dataset with the describe functionality from Hmisc.
+
+```{r desc}
+head(gapminder)
+
+describe(gapminder)
+
+plot(describe(gapminder))
+```
+
+To build a ggplot object we must first construct the basic structure of the plot. This means what data is used as well as typically an aesthetic mapping of specific variables to components of the plot. The main ones are what goes to the x and y axis. 
+
+```{r empty}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp))
+```
+
+Note that this alone leaves an empty plot. We haven't added a 'geometry' layer yet, so ggplot doesnt know how to show our data. We can add a point geometry to make a scatter plot, which makes sense for this situation in which we are plotting two continuous variables. 
+
+```{r}
+# describe the base ggplot object and tell it what data we are interested in along with the aesthetic mapping
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  # add a points layer on top
+  geom_point()
+```
+
+We can change the color, size and other features of most geomtries, points are no exception. Note the use of "alpha" here. Alpha is a transparency, and can help visualization especially when there is a signficant amount of overplotting. 
+
+```{r}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(alpha = 0.5, col = "cornflowerblue", size = 0.5)
+```
+
+We don't only have to change color by specifying a specific color though. Ggplot is designed around the idea of mapping aspects of data (variables) to aspects of the visualization. IN this case we can map a factor variable to the color aesthetic. This gives us the effect of using different colors for each group of points. Here we use the continent variable making a different color for each continent. 
+
+```{r}
+unique(gapminder$continent)
+
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point(alpha = 0.5, size = 0.5) 
+```
+
+We are not limited to mapping only one additional variable, we can map many, here we alos map the population size of each country in each year to the size of the data point. In this way we can convey a lot of information rapidly. THough the visualization below is quite jumbled. 
+
+```{r}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.5)
+
+```
+
+We of course are not only limited to point geometries. There are many, many types. Lines are shown below. 
+
+```{r}
+
+ggplot(gapminder, aes(x = year, y = lifeExp, group = country, color = continent)) +
+  geom_line(alpha = 0.5)
+
+```
+
+We can also do a boxplot easily, which makes good sense for a continuous dependant variable and a categorical independent variable. Some ggplot geomteries, use color for the outline and fill for the main color of a plot. 
+
+```{r}
+
+ggplot(gapminder, aes(x = continent, y = lifeExp, fill = continent)) +
+  geom_boxplot()
+```
+
+We can make histograms, with one continuous variable quite easily, and bar charts with the combination of geom_bar( stat = "identity") if one has the actual values included in the Y variable. 
+
+```{r}
+ggplot(gapminder, aes(x = lifeExp)) + 
+  geom_histogram(binwidth = 3)
+```
+
+Ggplot allows a simple implementation of smooth functions which can include loess, gam, and most regression models using a geom_smooth() argument. 
+
+```{r}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, size = pop)) +
+  geom_point(aes(color = continent), alpha = 0.5) +
+  geom_smooth(se = FALSE, method = "loess", color = "grey30")
+```
+
+it also works well as an output of a pipe command because the data argument is first. 
+
+```{r}
+gapminder %>% filter(year == 2007) %>%
+ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.5)
+```
+
+We can change aspects about the axes such as putting them on log scales. 
+
+```{r}
+gapminder %>% filter(year == 2007) %>%
+ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.5) +
+  scale_x_log10()
+```
+
+and give them specific markers. 
+
+```{r}
+gapminder %>% filter(year == 2007) %>%
+ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  geom_point(alpha = 0.5) +
+  # clean the x-axis breaks
+  scale_x_log10(breaks = c(1, 10, 100, 1000, 10000),
+                limits = c(1, 120000))
+```
+
+or fix their labels so that they are appropriately descriptive rather than simply using the variable names. 
+
+```{r}
+gapminder %>% filter(year == 2007) %>%
+ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  # add scatter points
+  geom_point(alpha = 0.5) +
+  # log-scale the x-axis
+  scale_x_log10() +
+  # change labels
+  labs(title = "GDP versus life expectancy in 2007",
+       x = "GDP per capita (log scale)",
+       y = "Life expectancy",
+       size = "Popoulation",
+       color = "Continent")
+```
+
+We can also provide similar fixes for the legend 
+
+```{r}
+gapminder %>% filter(year == 2007) %>%
+ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  # add scatter points
+  geom_point(alpha = 0.5) +
+  # log-scale the x-axis
+  scale_x_log10() +
+  # change labels
+  labs(title = "GDP versus life expectancy in 2007",
+       x = "GDP per capita (log scale)",
+       y = "Life expectancy",
+       size = "Popoulation (millions)",
+       color = "Continent") +
+  # change the size scale
+  scale_size(range = c(0.1, 10),
+             breaks = 1000000 * c(250, 500, 750, 1000, 1250),
+             labels = c("250", "500", "750", "1000", "1250")) 
+```
+
+faceting and facet_wrap() and facet_grid() provide formula based approaches to creating multiple panels in the same chart. Here we use a single variable to create these. 
+
+```{r}
+gapminder %>% filter(year == 2007) %>%
+ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  # add scatter points
+  geom_point(alpha = 0.5) +
+  # log-scale the x-axis
+  scale_x_log10() +
+  # change labels
+  labs(title = "GDP versus life expectancy in 2007",
+       x = "GDP per capita (log scale)",
+       y = "Life expectancy",
+       size = "Popoulation (millions)",
+       color = "Continent") +
+  # change the size scale
+  scale_size(range = c(0.1, 10),
+             breaks = 1000000 * c(250, 500, 750, 1000, 1250),
+             labels = c("250", "500", "750", "1000", "1250")) +
+  # add faceting
+  facet_wrap(~continent)
+```
+
+There are also many themes which provide simple paths to changing alot of the basic look of the charts. 
+
+
+```{r}
+gapminder %>% filter(year == 2007) %>%
+ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+  # add scatter points
+  geom_point(alpha = 0.5) +
+  # clean the axes names and breaks
+  scale_x_log10(breaks = c(1000, 10000),
+                limits = c(200, 120000)) +
+  # change labels
+  labs(title = "GDP versus life expectancy in 2007",
+       x = "GDP per capita (log scale)",
+       y = "Life expectancy",
+       size = "Popoulation (millions)",
+       color = "Continent") +
+  # change the size scale
+  scale_size(range = c(0.1, 10),
+             breaks = 1000000 * c(250, 500, 750, 1000, 1250),
+             labels = c("250", "500", "750", "1000", "1250")) +
+  # add a nicer theme
+  theme_classic()
+
+```
+
+We can move the legend around. 
+
+```{r}
+gapminder_2007 <- gapminder %>% filter(year == 2007)
+gapminder %>% filter(year == 2007) %>%
+ggplot() +
+  # add scatter points
+  geom_point(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop),
+             alpha = 0.5) +
+  # add some text annotations for the very large countries
+  geom_text(aes(x = gdpPercap, y = lifeExp + 3, label = country),
+            color = "grey50",
+            data = filter(gapminder_2007, pop > 1000000000 | country %in% c("Nigeria", "United States"))) +
+  # clean the axes names and breaks
+  scale_x_log10(limits = c(200, 60000)) +
+  # change labels
+  labs(title = "GDP versus life expectancy in 2007",
+       x = "GDP per capita (log scale)",
+       y = "Life expectancy",
+       size = "Popoulation",
+       color = "Continent") +
+  # change the size scale
+  scale_size(range = c(0.1, 10),
+             # remove size legend
+             guide = "none") +
+  # add a nicer theme
+  theme_classic() +
+  # place legend at top and grey axis lines
+  theme(legend.position = "top",
+        axis.line = element_line(color = "grey85"),
+        axis.ticks = element_line(color = "grey85"))
+```
+
+and we can save ggplots as objects in the normal way and call them later, we can also save them as image files easily using ggsave(). 
+
+
+```{r}
+p <- gapminder %>% filter(year == 2007) %>% ggplot() +
+  # add scatter points
+  geom_point(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop),
+             alpha = 0.5) +
+  # add some text annotations for the very large countries
+  geom_text(aes(x = gdpPercap, y = lifeExp + 3, label = country),
+            color = "grey50",
+            data = filter(gapminder_2007, pop > 1000000000 | country %in% c("Nigeria", "United States"))) +
+  # clean the axes names and breaks
+  scale_x_log10(limits = c(200, 60000)) +
+  # change labels
+  labs(title = "GDP versus life expectancy in 2007",
+       x = "GDP per capita (log scale)",
+       y = "Life expectancy",
+       size = "Popoulation",
+       color = "Continent") +
+  # change the size scale
+  scale_size(range = c(0.1, 10),
+             # remove size legend
+             guide = "none") +
+  # add a nicer theme
+  theme_classic() +
+  # place legend at top and grey axis lines
+  theme(legend.position = "top",
+        axis.line = element_line(color = "grey85"),
+        axis.ticks = element_line(color = "grey85"))
+
+# save the plot
+ggplot2::ggsave("beautiful_plot.png", p, dpi = 300, width = 6, height = 4)
+```
+
+ggmap is a related package that integrates some basic mapping and interaction with the goole maps (and other) APIs with ggplot. We'll show below some basic uses of this as examples. Note that currently google requires one to register using a credit card for the use of the google maps API in this way, and that one can be charged by google if use exceeds some threseholds. 
+
+Instructions on how to do this are found here: [google API and ggmap](https://www.littlemissdata.com/blog/maps)
+
+First, just getting a map. The get_map() function from ggmap can pull maps from google as well as some other sites. Note that we can actually use geocodes for this, or more or less anythig that goes into the google maps search field and finds a map directly. 
+
+```{r}
+locus <- "Basilica di San Marco, Venezia, Italy"
+
+myMap <- get_map(location=locus, zoom= 18, source="google", 
+                 maptype="roadmap", crop=TRUE)
+
+ggmap(myMap)
+```
+
+We can get all the kinds of visualizations that google maps already has. 
+
+```{r}
+myMap <- get_map(location=locus, zoom= 18, 
+                 source="google", maptype="satellite", crop=TRUE)
+ggmap(myMap)
+```
+
+At all the zoom levels. 
+
+```{r}
+myMap <- get_map(location=locus, zoom= 19, 
+                 source="google", maptype="hybrid", crop=TRUE)
+ggmap(myMap)
+```
+
+We can also get stamen/stadia maps which have some nice visualizations.
+
+```{r not_working}
+#myMap <- get_map(location=locus, zoom= 15, 
+#                 source="stadia", maptype="stamen_watercolor", crop=TRUE)
+#ggmap(myMap)
+```
+
+Another example. 
+
+```{r}
+myMap <- get_map(location=locus, zoom= 15, 
+                 source="stadia", maptype="stamen_toner", crop=TRUE)
+ggmap(myMap)
+
+```
+
+The geocode() function performs geocoding (identifying latitude and longitude (or other specific geographic information from strings such as addresses or place names)). Then we can overlay ggplot geometries to enhance the google map backgrounds. 
+
+```{r}
+addresses <- c("3627 1st St New Orleans LA 70125", "1428 Chartres St New Orleans LA 70116")
+
+data_df <- data.frame(address = addresses)
+data_df <- cbind(data_df, geocode(addresses, source = "google"))
+
+locus <- "New Orleans"
+myMap <- get_map(location=locus, zoom= 14, 
+                 source="stadia", maptype = "outdoors", crop=TRUE)
+ggmap(myMap) + geom_point(data = data_df, aes( x = lon, y = lat))
+```
+
+Here is an example using Seattle crime data that shows how these visualizations can nicely integrate map capabilities with standard plotting approaches. note the specification of color below uses hex color approach, there are many ways to describe color [Color Hex](https://www.w3schools.com/colors/colors_hexadecimal.asp) is one. red, green, blue (RGB) is another and there are many more. 
+
+
+```{r}
+#incidents <- read.csv('https://raw.githubusercontent.com/lgellis/MiscTutorial/master/ggmap#/i2Sample.csv', stringsAsFactors = FALSE)
+
+#write_csv(incidents, path = "C:/Users/jyukich/Documents/sphu4160/fall_2019/class_lib_R/incidents.csv" )
+
+incidents <- read_csv("C:/Users/jyukich/Documents/sphu4160/fall_2019/class_lib_R/incidents.csv")
+
+dim(incidents)
+
+head(incidents)
+
+col1 <- "#CC0000"
+
+#add year to the incidents data frame
+incidents$ymd <- mdy_hms(incidents$Event.Clearance.Date)
+incidents$year <- year(incidents$ymd)
+
+#Create a more manageable data frame with only 2017 and 2018 data
+i2 <- incidents %>% 
+  filter(year>=2017 & year<=2018)
+
+#Only include complete cases
+i2[complete.cases(i2), ]
+
+p <- get_map(location =  c(lon = -122.335167, lat = 47.608013),
+                    zoom = 14, scale = 2,
+                    maptype ='satellite',
+                    color = 'color')
+
+p <- ggmap(p)
+p + geom_point(aes(x = Longitude, y = Latitude), alpha=0.3, size = 0.5, colour = col1, data = i2) + theme(legend.position="none")
+```
