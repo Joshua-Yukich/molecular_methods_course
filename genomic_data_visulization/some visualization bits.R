@@ -183,3 +183,10 @@ filled.contour(cos(r^2)*exp(-r/(2*pi)),
                axes=FALSE,
                color.palette=viridis,
                asp=1)
+
+
+# to use dichromat 
+v <- ggplot(faithfuld, aes(waiting, eruptions, z = density))
+v + geom_contour_filled(palette = camre_pal)
+
+

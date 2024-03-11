@@ -102,8 +102,8 @@ We don't only have to change color by specifying a specific color though. Ggplot
 ```{r}
 unique(gapminder$continent)
 
-ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
-  geom_point(alpha = 0.5, size = 0.5) 
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(alpha = 0.5, size = 0.5, aes(color = continent)) 
 ```
 
 We are not limited to mapping only one additional variable, we can map many, here we alos map the population size of each country in each year to the size of the data point. In this way we can convey a lot of information rapidly. THough the visualization below is quite jumbled. 
@@ -149,9 +149,12 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, size = pop)) +
 it also works well as an output of a pipe command because the data argument is first. 
 
 ```{r}
-gapminder %>% filter(year == 2007) %>%
+gapminder %>% #filter(year == 1997) %>%
+#ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
+#  geom_point(alpha = 0.5)
 ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop)) +
-  geom_point(alpha = 0.5)
+  geom_point(alpha = 0.5) + facet_wrap(~year)
+
 ```
 
 We can change aspects about the axes such as putting them on log scales. 
