@@ -16,27 +16,18 @@
 #                                                                             #
 ###############################################################################
 
-# installation of required packages (Commented) ----
+# example installation of required packages (Commented) ----
+
+
 #if (!require("BiocManager", quietly = TRUE))
 #  install.packages("BiocManager")
 #BiocManager::install(version = "3.18")
 #BiocManager::install('ggbio')
 #install.packages('rprojroot')
-#install.packages('seqinr')
-#install.packages('outbreaker2')
-#install.packages('rprojroot')
-#install.packages('tidyverse')
-#install.packages('ape')
-#install.packages('phangorn')
-#BiocManager::install('DECIPHER')
-#install.packages('adephylo')
-#install.packages('adegenet')
 
 # loading required libraries ----
-library(ggbio)
 library(rprojroot)
 library(GenomicRanges)
-library(ggtree)
 library(Biostrings)
 library(DECIPHER)
 library(phangorn)
@@ -44,15 +35,18 @@ library(treeio)
 library(tidytree)
 library(ggtreeExtra)
 library(phyloseq)
-library(dplyr)
+library(adephylo)
+library(tidyverse)
+library(ggtree)
 library(dichromat)
 library(ggpubr)
 library(pheatmap) ## for heatmap generation
-library(tidyverse) ## for data wrangling
 library(ggplotify) ## to convert pheatmap to ggplot2
 library(heatmaply) ## for constructing interactive heatmap
 library(airway)
-
+library(ggbio)
+library(TDbook)
+library(scales)
 # session info -----
 
 run_date <- date()
@@ -65,7 +59,7 @@ sessionInfo()
 #https://bioinformatics.ccr.cancer.gov/docs/data-visualization-with-r/#welcome-to-the-data-visualization-with-r-series
 # https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0099625
 # and https://yulab-smu.top/treedata-book/index.html
-
+# https://r-graph-gallery.com/297-circular-barplot-with-groups.html
 
 
 # setting working directory and other user preferences -----
@@ -108,6 +102,7 @@ writeXStringSet(DNA, file="./R_example/sequences_from_session_1_aligned.fna")
 seqs <- read.dna("./R_example/sequences_from_session_1_aligned.fna", format="fasta")
 seqs
 
+class(seqs)
 #create a phyDat object
 virus_phyDat <- phyDat(seqs, type = "DNA", levels = NULL)
 
@@ -125,9 +120,7 @@ virus_UPGMA <- upgma(dna_dist)
 
 virus_NJ <- NJ(dna_dist)
 
-#CairoPDF(file = "test.pdf")
 plot(virus_UPGMA, main="UPGMA")
-#dev.off()
 
 plot(virus_NJ, main = "Neighbor Joining")
 plot(virus_NJ, type = "unrooted", cex = 0.5)
@@ -212,6 +205,7 @@ ggtree(virus_UPGMA_full) +geom_label(aes(x=branch, label=orig), fill='lightgreen
 
 data("GlobalPatterns")
 GP <- GlobalPatterns
+GP@sam_data
 GP <- prune_taxa(taxa_sums(GP) > 600, GP)
 sample_data(GP)$human <- get_variable(GP, "SampleType") %in%
   c("Feces", "Skin")
@@ -321,9 +315,11 @@ r + scale_fill_manual(values = dichromat(scales::hue_pal()(4), type = "deutan"))
 r + scale_fill_manual(values = dichromat(scales::hue_pal()(4), type = "protan"))
 r + scale_fill_manual(values = dichromat(scales::hue_pal()(4), type = "tritan"))
 
-str(p)
+str(r)
+ggplot_build(r)
 
-
+show_col(ggplot_build(r)$data[[1]]$fill)
+show_col(dichromat(ggplot_build(r)$data[[1]]$fill))
 
 
 mat <- read.csv("./genomic_data_visulization/RNAseq_mat_top20.csv",header=TRUE,row.names=1,
