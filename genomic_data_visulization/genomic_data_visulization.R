@@ -47,6 +47,8 @@ library(airway)
 library(ggbio)
 library(TDbook)
 library(scales)
+
+
 # session info -----
 
 run_date <- date()
@@ -75,7 +77,6 @@ source('base_environment.R')
 
 # preserve graphics settings ----
 par_old <- par()
-
 
 # now for a start ----
 
@@ -201,7 +202,7 @@ ggtree(virus_UPGMA_full, layout='circular', ladderize = TRUE, size=2.8) +
 
 ggtree(virus_UPGMA_full) +geom_label(aes(x=branch, label=orig), fill='lightgreen') +
   geom_cladelab(node=19, label="another clade", align=TRUE, 
-                                                                                                   geom='label', fill='lightblue')
+                               geom='label', fill='lightblue')
 
 data("GlobalPatterns")
 GP <- GlobalPatterns
@@ -316,7 +317,7 @@ r + scale_fill_manual(values = dichromat(scales::hue_pal()(4), type = "protan"))
 r + scale_fill_manual(values = dichromat(scales::hue_pal()(4), type = "tritan"))
 
 str(r)
-ggplot_build(r)
+show_col(dichromat(unique(ggplot_build(r)$data[[1]]$fill)))
 
 show_col(ggplot_build(r)$data[[1]]$fill)
 show_col(dichromat(ggplot_build(r)$data[[1]]$fill))
@@ -338,7 +339,8 @@ pheatmap(mat)
 pheatmap(mat, scale="row")
 
 pheatmap(mat,scale="row",
-         color=dichromat(colorRampPalette(c("navy", "white", "red"))(50), type = "tritan"))
+         color=dichromat(colorRampPalette(c("navy", "white", "red"))(50),
+                         type = "protan"))
 
 
 dfh <- data.frame(sample=as.character(colnames(mat)),dex="Treatment")%>%

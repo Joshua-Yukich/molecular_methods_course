@@ -21,7 +21,7 @@
 
 # installation of required packages (Commented) ----
 
-#BiocManager::install(version = "3.11")
+#BiocManager::install(version = "3.19")
 #install.packages('seqinr')
 #install.packages('outbreaker2')
 #install.packages('rprojroot')
