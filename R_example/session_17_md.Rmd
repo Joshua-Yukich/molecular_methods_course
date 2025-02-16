@@ -56,7 +56,7 @@ sessionInfo()
 
 # An example using a paired Student's *t*-test 
 
-This document first includes by direct input data from an experiment in which ten mice were fed an experimental drug and weighed before and after the experiment. The goal was to determine if the mice would gain a meaningful amount of weight before and after the administration of drug. Hence we have ten pairs of weights, each representing the two measurements of weight in each mouse. The code below shows the entry of the data directly, as well as some minor tidying followed by execution of the paired Student's *t*-test using the data either input as two separate vectors, or using a "formula" object and a data frame. 
+This document first includes by direct input data from an experiment in which ten mice were fed an experimental drug and weighed before and after the experiment. The goal was to determine if the mice would gain a meaningful amount of weight before and after the administration of drug. Hence we have ten pairs of weights, each representing the two measurements of weight in each mouse. The code below shows the entry of the data directly, as well as some minor tidying followed by execution of the paired Student's *t*-test using the data either input as two separate vectors. 
 
 
 ```{r ttest, include = "TRUE"}
@@ -74,14 +74,8 @@ my_data$id <- rep(1:10, times = 2)
 # Compute t-test using two different numeric vectors
 res1 <- t.test(after, before, paired = TRUE)
 res1
-
-# Compute t-test from data.frame
-res2 <- t.test(weight ~ group, data = my_data, paired = TRUE)
-res2
 ```
 
-
-One can see that the results of both approaches are exactly the same (this of course is only true when the arguments are specified correctly). 
 
 
 # Making a plot 
@@ -110,5 +104,5 @@ ggplot(data = my_data, aes(x = group, y = weight)) +
 
 The above code chunks only put outputs into the documents as whole sections in a document. From time to time you may want to directly include elements from R directly inside the course of a sentence.
 
-For example: The results of a Student's paired *t*-test applied to the before and after mice weight dataset were highly significant with an estimated mean of the difference in weight of `r res2[["estimate"]]` grams (*p*-value `r ifelse(res2[["p.value"]] < 0.001, "< 0.001", paste('=', res2[["p.value"]], sep =" "))`) between the measurements of weight before and after treatment.
+For example: The results of a Student's paired *t*-test applied to the before and after mice weight dataset were highly significant with an estimated mean of the difference in weight of `r res1[["estimate"]]` grams (*p*-value `r ifelse(res1[["p.value"]] < 0.001, "< 0.001", paste('=', res1[["p.value"]], sep =" "))`) between the measurements of weight before and after treatment.
 
