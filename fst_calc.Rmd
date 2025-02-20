@@ -1,0 +1,123 @@
+---
+title: "R Fst Calculation: basic bio informatics"
+output: html_document
+date: "2025-02-20"
+author: "J. Yukich"
+---
+
+```{r setup}
+###############################
+#
+#
+#  Some basic BioInformatic Analysis
+#    Fst calculation.
+#
+#       J. Yukich Feb 20th 2025
+#
+#
+################################
+# load required packages -----
+library(adegenet)
+library(rprojroot)
+
+# setting working directory and other user preferences -----
+
+if (interactive()) {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+}
+
+base_path <- find_root('base_environment.R')
+
+setwd(base_path)
+source('base_environment.R')
+```
+
+
+# **What is Fst?**
+Fst (Fixation Index) is a measure of genetic differentiation between populations. It quantifies how genetic variation is partitioned among populations relative to the total genetic variation. It ranges from **0 to 1**, where:
+  - **Fst = 0** → No genetic differentiation (populations share the same alleles at the same frequencies).
+- **Fst = 1** → Complete genetic separation (populations have entirely different alleles).
+
+### **Why is Fst Important?**
+Fst helps in understanding:
+  - Population structure and gene flow.
+- Evolutionary processes like natural selection and genetic drift.
+- Conservation biology, by identifying genetically distinct populations.
+
+---
+  
+  ## **How to Calculate Fst?**
+  Fst is calculated using allele frequencies across populations. The basic formula is:
+  
+  \[
+    F_{ST} = \frac{H_T - H_S}{H_T}
+    \]
+
+Where:
+  - **Ht (Total heterozygosity)**: Expected heterozygosity in the entire population (pooled across subpopulations).
+- **Hs (Subpopulation heterozygosity)**: Average expected heterozygosity within each subpopulation.
+
+### **Step-by-Step Calculation of Fst**
+#### **Step 1: Calculate Allele Frequencies**
+For a biallelic locus (two alleles, e.g., A and a), suppose we have two populations:
+  
+  | Population | \( p_A \) | \( p_a \) |
+  |------------|------------|------------|
+  | Pop 1 | 0.6 | 0.4 |
+  | Pop 2 | 0.8 | 0.2 |
+  
+  #### **Step 2: Compute Heterozygosities**
+  The expected heterozygosity for each population is:
+  
+  \[
+    H_s = 2 p q
+    \]
+
+For Pop 1:
+  \[
+    H_{s1} = 2 (0.6)(0.4) = 0.48
+    \]
+
+For Pop 2:
+  \[
+    H_{s2} = 2 (0.8)(0.2) = 0.32
+    \]
+
+The average heterozygosity across subpopulations:
+  
+  \[
+    H_S = \frac{H_{s1} + H_{s2}}{2} = \frac{0.48 + 0.32}{2} = 0.40
+    \]
+
+#### **Step 3: Calculate Total Heterozygosity**
+The overall allele frequencies across populations:
+  
+  \[
+    \bar{p} = \frac{p_1 + p_2}{2} = \frac{0.6 + 0.8}{2} = 0.7
+    \]
+\[
+  \bar{q} = 1 - \bar{p} = 0.3
+  \]
+
+Total heterozygosity:
+  
+  \[
+    H_T = 2 \bar{p} \bar{q} = 2(0.7)(0.3) = 0.42
+    \]
+
+#### **Step 4: Compute Fst**
+\[
+  F_{ST} = \frac{H_T - H_S}{H_T} = \frac{0.42 - 0.40}{0.42} = \frac{0.02}{0.42} \approx 0.048
+  \]
+
+---
+  
+  ### **Interpretation**
+  - **Fst ≈ 0.048** means there is very little genetic differentiation between the two populations.
+- Generally:
+  - **Fst < 0.05** → Low differentiation
+- **0.05 - 0.15** → Moderate differentiation
+- **0.15 - 0.25** → High differentiation
+- **Fst > 0.25** → Very high differentiation
+
+Would you like me to calculate Fst for real data? If you provide allele frequencies, I can compute it for you.
