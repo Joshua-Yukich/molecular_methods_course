@@ -362,59 +362,39 @@ informatics</h1>
 #
 #
 #  Some basic BioInformatic Analysis
-#    Fst calculation.
+#    Fst/Gst calculation.
 #
 #       J. Yukich Feb 20th 2025
 #
 #
-################################
-# load required packages -----
-library(adegenet)</code></pre>
-<pre><code>## Loading required package: ade4</code></pre>
-<pre><code>## 
-##    /// adegenet 2.1.11 is loaded ////////////
-## 
-##    &gt; overview: &#39;?adegenet&#39;
-##    &gt; tutorials/doc/questions: &#39;adegenetWeb()&#39; 
-##    &gt; bug reports/feature requests: adegenetIssues()</code></pre>
-<pre class="r"><code>library(rprojroot)
-
-# setting working directory and other user preferences -----
-
-if (interactive()) {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-}
-
-base_path &lt;- find_root(&#39;base_environment.R&#39;)
-
-setwd(base_path)
-source(&#39;base_environment.R&#39;)</code></pre>
+################################</code></pre>
 <div id="what-is-fst" class="section level1">
 <h1><strong>What is Fst?</strong></h1>
 <p>Fst (Fixation Index) is a measure of genetic differentiation between
 populations. It quantifies how genetic variation is partitioned among
 populations relative to the total genetic variation. It ranges from
-<strong>0 to 1</strong>, where: - <strong>Fst = 0</strong> → No genetic
-differentiation (populations share the same alleles at the same
-frequencies). - <strong>Fst = 1</strong> → Complete genetic separation
+<strong>0 to 1</strong>, where:</p>
+<ul>
+<li><p><strong>Fst = 0</strong> → No genetic differentiation
+(populations share the same alleles at the same frequencies).</p></li>
+<li><p><strong>Fst = 1</strong> → Complete genetic separation
 (populations have entirely different alleles).</p>
-<div id="why-is-fst-important" class="section level3">
-<h3><strong>Why is Fst Important?</strong></h3>
-<p>Fst helps in understanding: - Population structure and gene flow. -
-Evolutionary processes like natural selection and genetic drift. -
-Conservation biology, by identifying genetically distinct
-populations.</p>
-<hr />
-<p>## <strong>How to Calculate Fst?</strong> Fst is calculated using
-allele frequencies across populations. The basic formula is:</p>
+<h2 id="how-to-calculate-fst"><strong>How to Calculate
+Fst?</strong></h2>
+<p>Fst is calculated using allele frequencies across populations. The
+basic formula is:</p>
 <p><span class="math display">\[
-    F_{ST} = \frac{H_T - H_S}{H_T}
-    \]</span></p>
-<p>Where: - <strong>Ht (Total heterozygosity)</strong>: Expected
-heterozygosity in the entire population (pooled across subpopulations).
-- <strong>Hs (Subpopulation heterozygosity)</strong>: Average expected
-heterozygosity within each subpopulation.</p>
-</div>
+  F_{ST} = \frac{H_T - H_S}{H_T}
+  \]</span></p></li>
+</ul>
+<p>Where:</p>
+<ul>
+<li><p><strong>Ht (Total heterozygosity)</strong>: Expected
+heterozygosity in the entire population (pooled across
+subpopulations).</p></li>
+<li><p><strong>Hs (Subpopulation heterozygosity)</strong>: Average
+expected heterozygosity within each subpopulation.</p></li>
+</ul>
 <div id="step-by-step-calculation-of-fst" class="section level3">
 <h3><strong>Step-by-Step Calculation of Fst</strong></h3>
 <div id="step-1-calculate-allele-frequencies" class="section level4">
@@ -442,8 +422,11 @@ two populations:</p>
 </tr>
 </tbody>
 </table>
-<p>#### <strong>Step 2: Compute Heterozygosities</strong> The expected
-heterozygosity for each population is:</p>
+</div>
+<div id="step-2-compute-heterozygosities-the-expected-heterozygosity-for" class="section level4">
+<h4><strong>Step 2: Compute Heterozygosities</strong> The expected
+heterozygosity for</h4>
+<p>each population is:</p>
 <p><span class="math display">\[
     H_s = 2 p q
     \]</span></p>
@@ -478,14 +461,287 @@ heterozygosity for each population is:</p>
 \frac{0.02}{0.42} \approx 0.048
   \]</span></p>
 <hr />
-<p>### <strong>Interpretation</strong> - <strong>Fst ≈ 0.048</strong>
-means there is very little genetic differentiation between the two
-populations. - Generally: - <strong>Fst &lt; 0.05</strong> → Low
-differentiation - <strong>0.05 - 0.15</strong> → Moderate
-differentiation - <strong>0.15 - 0.25</strong> → High differentiation -
-<strong>Fst &gt; 0.25</strong> → Very high differentiation</p>
-<p>Would you like me to calculate Fst for real data? If you provide
-allele frequencies, I can compute it for you.</p>
+</div>
+<div id="interpretation---fst-0.048-means-there-is-very-little-genetic-differentiation-between-the-two-populations." class="section level4">
+<h4><strong>Interpretation</strong> - <strong>Fst ≈ 0.048</strong> means
+there is very little genetic differentiation between the two
+populations.</h4>
+<ul>
+<li><p>Generally:</p></li>
+<li><p><strong>Fst &lt; 0.05</strong> → Low differentiation</p></li>
+<li><p><strong>0.05 - 0.15</strong> → Moderate differentiation</p></li>
+<li><p><strong>0.15 - 0.25</strong> → High differentiation</p></li>
+<li><p><strong>Fst &gt; 0.25</strong> → Very high
+differentiation</p></li>
+</ul>
+</div>
+<div id="real-data" class="section level4">
+<h4><strong>Real Data</strong></h4>
+<p>We’re going to take some data that has been derived from sequncing
+data, which has already been aligned and variant called. These data are
+often stored in .vcf format, or compressed into a .vcf.gz ‘tarball’ when
+they are large.</p>
+<pre class="r"><code># load required packages -----
+install.packages(&quot;adegenet&quot;)
+install.packages(&quot;vcfR&quot;)
+install.packages(&quot;pinfsc50&quot;)
+install.packages(&quot;ape&quot;)</code></pre>
+<p>Once its installed, load the library for use.</p>
+<pre class="r"><code># load required packages -----
+library(adegenet)</code></pre>
+<pre><code>## Loading required package: ade4</code></pre>
+<pre><code>## 
+##    /// adegenet 2.1.11 is loaded ////////////
+## 
+##    &gt; overview: &#39;?adegenet&#39;
+##    &gt; tutorials/doc/questions: &#39;adegenetWeb()&#39; 
+##    &gt; bug reports/feature requests: adegenetIssues()</code></pre>
+<pre class="r"><code>library(vcfR)</code></pre>
+<pre><code>## 
+##    *****       ***   vcfR   ***       *****
+##    This is vcfR 1.15.0 
+##      browseVignettes(&#39;vcfR&#39;) # Documentation
+##      citation(&#39;vcfR&#39;) # Citation
+##    *****       *****      *****       *****</code></pre>
+<pre class="r"><code>library(ape)</code></pre>
+<p>Then we can process the files. first we’ point to the file
+locations.</p>
+<pre class="r"><code>pkg &lt;- &quot;pinfsc50&quot;
+vcf_file &lt;- system.file(&quot;extdata&quot;, &quot;pinf_sc50.vcf.gz&quot;, package = pkg)
+dna_file &lt;- system.file(&quot;extdata&quot;, &quot;pinf_sc50.fasta&quot;, package = pkg)
+gff_file &lt;- system.file(&quot;extdata&quot;, &quot;pinf_sc50.gff&quot;, package = pkg)
+
+vcf &lt;- read.vcfR(vcf_file)</code></pre>
+<pre><code>## Scanning file to determine attributes.
+## File attributes:
+##   meta lines: 29
+##   header_line: 30
+##   variant count: 22031
+##   column count: 27
+## Meta line 29 read in.
+## All meta lines processed.
+## gt matrix initialized.
+## Character matrix gt created.
+##   Character matrix gt rows: 22031
+##   Character matrix gt cols: 27
+##   skip: 0
+##   nrows: 22031
+##   row_num: 0
+## Processed variant 1000Processed variant 2000Processed variant 3000Processed variant 4000Processed variant 5000Processed variant 6000Processed variant 7000Processed variant 8000Processed variant 9000Processed variant 10000Processed variant 11000Processed variant 12000Processed variant 13000Processed variant 14000Processed variant 15000Processed variant 16000Processed variant 17000Processed variant 18000Processed variant 19000Processed variant 20000Processed variant 21000Processed variant 22000Processed variant: 22031
+## All variants processed</code></pre>
+<pre class="r"><code>dna &lt;- read.dna(dna_file, format=&quot;fasta&quot;)</code></pre>
+<p>Next steps is to give a population assignment to each “sample” since
+the default vcfR format doesn’t contian this.</p>
+<p>The data are derived from this study…</p>
+<p>Yoshida K, Schuenemann VJ, Cano LM, Pais M, Mishra B, Sharma R, Lanz
+C, Martin FN, Kamoun S, Krause J, Thines M, Weigel D, Burbano HA. The
+rise and fall of the <em>Phytophthora infestans</em> lineage that
+triggered the Irish potato famine. Elife. 2013 May 28;2:e00731. doi:
+10.7554/eLife.00731. Erratum in: Elife. 2013;2:e01108. PMID: 23741619;
+PMCID: PMC3667578.</p>
+<p>The basic dat ais that these are sequenced data for <em>P.
+infestans</em>, the filamentous microrganisim responsible for the
+“potato famine” which led massive disolocations in Europe and N. America
+in the mid 18th century.</p>
+<p>The 240 Mb T30-4 reference genome of <em>P. infestans</em> is large,
+with three quarters of the genome consisting of repetitive DNA.</p>
+<p>Lets look at the DNA content,</p>
+<pre class="r"><code>print(head(dna))</code></pre>
+<pre><code>## 1 DNA sequence in binary format stored in a matrix.
+## 
+## Sequence length: 1042442 
+## 
+## Label:
+## Supercontig_1.50 of Phytophthora infestans T30-4
+## 
+## Base composition:
+##     a     c     g     t 
+## 0.248 0.251 0.251 0.250 
+## (Total: 1.04 Mb)</code></pre>
+<pre class="r"><code>head(read.delim(dna_file))</code></pre>
+<pre><code>##                  X.Supercontig_1.50.of.Phytophthora.infestans.T30.4
+## 1 ttctgccagt gtagatagct tgaccagtgc cgctttacgg atatcaatgt ggtgtctaag
+## 2 tggagaggga ggccgagcat caggatctcg ttacgttgaa tcgactagac gaagtggtgg
+## 3 tagttggatc cgggaaaagg acagtccagg tgatggttgt cactaggtac agaggaagga
+## 4 ttggatccag ccccccgatt ctcgaggaaa catttgtgaa gggagtacgc atcgagcgga
+## 5 tcctcaaagc acataacgag gaagcgtgga tcttaggact aaagaagtat ctgatggggg
+## 6 atgtacgaga cctgagctcg gaggatacca aatcctacag tattatcgct acggattacg</code></pre>
+<pre class="r"><code>head(vcf)</code></pre>
+<pre><code>## [1] &quot;***** Object of class &#39;vcfR&#39; *****&quot;
+## [1] &quot;***** Meta section *****&quot;
+## [1] &quot;##fileformat=VCFv4.1&quot;
+## [1] &quot;##source=\&quot;GATK haplotype Caller, phased with beagle4\&quot;&quot;
+## [1] &quot;##FILTER=&lt;ID=LowQual,Description=\&quot;Low quality\&quot;&gt;&quot;
+## [1] &quot;##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description=\&quot;Allelic depths fo [Truncated]&quot;
+## [1] &quot;##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description=\&quot;Approximate read  [Truncated]&quot;
+## [1] &quot;##FORMAT=&lt;ID=GQ,Number=1,Type=Integer,Description=\&quot;Genotype Quality\&quot;&gt;&quot;
+## [1] &quot;First 6 rows.&quot;
+## [1] 
+## [1] &quot;***** Fixed section *****&quot;
+##      CHROM              POS   ID REF  ALT QUAL      FILTER
+## [1,] &quot;Supercontig_1.50&quot; &quot;41&quot;  NA &quot;AT&quot; &quot;A&quot; &quot;4784.43&quot; NA    
+## [2,] &quot;Supercontig_1.50&quot; &quot;136&quot; NA &quot;A&quot;  &quot;C&quot; &quot;550.27&quot;  NA    
+## [3,] &quot;Supercontig_1.50&quot; &quot;254&quot; NA &quot;T&quot;  &quot;G&quot; &quot;774.44&quot;  NA    
+## [4,] &quot;Supercontig_1.50&quot; &quot;275&quot; NA &quot;A&quot;  &quot;G&quot; &quot;714.53&quot;  NA    
+## [5,] &quot;Supercontig_1.50&quot; &quot;386&quot; NA &quot;T&quot;  &quot;G&quot; &quot;876.55&quot;  NA    
+## [6,] &quot;Supercontig_1.50&quot; &quot;462&quot; NA &quot;T&quot;  &quot;G&quot; &quot;1301.07&quot; NA    
+## [1] 
+## [1] &quot;***** Genotype section *****&quot;
+##      FORMAT           BL2009P4_us23              DDR7602                    
+## [1,] &quot;GT:AD:DP:GQ:PL&quot; &quot;1|1:0,7:7:21:283,21,0&quot;    &quot;1|1:0,6:6:18:243,18,0&quot;    
+## [2,] &quot;GT:AD:DP:GQ:PL&quot; &quot;0|0:12,0:12:36:0,36,427&quot;  &quot;0|0:20,0:20:60:0,60,819&quot;  
+## [3,] &quot;GT:AD:DP:GQ:PL&quot; &quot;0|0:27,0:27:81:0,81,1117&quot; &quot;0|0:26,0:26:78:0,78,1077&quot; 
+## [4,] &quot;GT:AD:DP:GQ:PL&quot; &quot;0|0:29,0:29:87:0,87,1243&quot; &quot;0|0:27,0:27:81:0,81,1158&quot; 
+## [5,] &quot;GT:AD:DP:GQ:PL&quot; &quot;0|0:26,0:26:78:0,78,1034&quot; &quot;0|0:30,0:30:90:0,90,1242&quot; 
+## [6,] &quot;GT:AD:DP:GQ:PL&quot; &quot;0|0:23,0:23:69:0,69,958&quot;  &quot;0|0:36,0:36:99:0,108,1556&quot;
+##      IN2009T1_us22               LBUS5                      
+## [1,] &quot;1|1:0,8:8:24:324,24,0&quot;     &quot;1|1:0,6:6:18:243,18,0&quot;    
+## [2,] &quot;0|0:16,0:16:48:0,48,650&quot;   &quot;0|0:20,0:20:60:0,60,819&quot;  
+## [3,] &quot;0|0:23,0:23:69:0,69,946&quot;   &quot;0|0:26,0:26:78:0,78,1077&quot; 
+## [4,] &quot;0|0:32,0:32:96:0,96,1299&quot;  &quot;0|0:27,0:27:81:0,81,1158&quot; 
+## [5,] &quot;0|0:41,0:41:99:0,122,1613&quot; &quot;0|0:30,0:30:90:0,90,1242&quot; 
+## [6,] &quot;0|0:35,0:35:99:0,105,1467&quot; &quot;0|0:36,0:36:99:0,108,1556&quot;
+##      NL07434                    
+## [1,] &quot;1|1:0,12:12:36:486,36,0&quot;  
+## [2,] &quot;0|0:28,0:28:84:0,84,948&quot;  
+## [3,] &quot;0|1:19,20:39:99:565,0,559&quot;
+## [4,] &quot;0|1:19,19:38:99:523,0,535&quot;
+## [5,] &quot;0|1:22,22:44:99:593,0,651&quot;
+## [6,] &quot;0|1:29,25:54:99:723,0,876&quot;
+## [1] &quot;First 6 columns only.&quot;
+## [1] 
+## [1] &quot;Unique GT formats:&quot;
+## [1] &quot;GT:AD:DP:GQ:PL&quot;
+## [1]</code></pre>
+<p>Assign a population vector to show which population each sample
+belongs to.</p>
+<pre class="r"><code>pop &lt;- as.factor(c(&quot;us&quot;, &quot;eu&quot;, &quot;us&quot;, &quot;af&quot;, &quot;eu&quot;, &quot;us&quot;, &quot;mx&quot;, &quot;eu&quot;, &quot;eu&quot;, &quot;sa&quot;, &quot;mx&quot;, &quot;sa&quot;, &quot;us&quot;, &quot;sa&quot;, &quot;Pmir&quot;, &quot;us&quot;, &quot;eu&quot;, &quot;eu&quot;))</code></pre>
+<p>Calculate and look at the Pop genetic stats.</p>
+<pre class="r"><code>myDiff &lt;- genetic_diff(vcf, pops = pop, method = &#39;nei&#39;)
+knitr::kable(myDiff[10:20,c(1:2,16:19)])</code></pre>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="26%" />
+<col width="7%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">CHROM</th>
+<th align="left">POS</th>
+<th align="right">Gst</th>
+<th align="right">Htmax</th>
+<th align="right">Gstmax</th>
+<th align="right">Gprimest</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">10</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">585</td>
+<td align="right">0.1500000</td>
+<td align="right">0.8027682</td>
+<td align="right">0.8827586</td>
+<td align="right">0.1699219</td>
+</tr>
+<tr class="even">
+<td align="left">11</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">616</td>
+<td align="right">0.0860215</td>
+<td align="right">0.8183391</td>
+<td align="right">0.8202960</td>
+<td align="right">0.1048664</td>
+</tr>
+<tr class="odd">
+<td align="left">12</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">617</td>
+<td align="right">0.0860215</td>
+<td align="right">0.8183391</td>
+<td align="right">0.8202960</td>
+<td align="right">0.1048664</td>
+</tr>
+<tr class="even">
+<td align="left">13</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">798</td>
+<td align="right">NaN</td>
+<td align="right">0.7664360</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="odd">
+<td align="left">14</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">803</td>
+<td align="right">NaN</td>
+<td align="right">0.7664360</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="even">
+<td align="left">15</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">836</td>
+<td align="right">NaN</td>
+<td align="right">0.7664360</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="odd">
+<td align="left">16</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">942</td>
+<td align="right">0.0727273</td>
+<td align="right">0.7906574</td>
+<td align="right">0.9330416</td>
+<td align="right">0.0779464</td>
+</tr>
+<tr class="even">
+<td align="left">17</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">1021</td>
+<td align="right">NaN</td>
+<td align="right">0.8581315</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="odd">
+<td align="left">18</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">1125</td>
+<td align="right">NaN</td>
+<td align="right">0.7647059</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="even">
+<td align="left">19</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">1281</td>
+<td align="right">0.1333333</td>
+<td align="right">0.8007812</td>
+<td align="right">0.8731707</td>
+<td align="right">0.1527002</td>
+</tr>
+<tr class="odd">
+<td align="left">20</td>
+<td align="left">Supercontig_1.50</td>
+<td align="left">1371</td>
+<td align="right">NaN</td>
+<td align="right">0.7734375</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
